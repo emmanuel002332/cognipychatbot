@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogniPy Chatbot - Dynamic</title>
+    <style>
+        /* CSS for the Chat Interface */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        #chat-container {
+            width: 90%;
+            max-width: 500px;
+            background: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+        }
+        #chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+            background-color: #e9f7ef;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: #d1e7dd;
+            align-self: flex-end;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 0;
+        }
+        .ai-message {
+            background-color: #4CAF50;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+        #input-area {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ccc;
+        }
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        #send-button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        .header {
+            background-color: #38703a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="chat-container">
+    <div class="header">🧠 COGNIPY 🤖 (Dynamic)</div>
+    <div id="chat-box">
+        </div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Ask the time, or a question..." autofocus>
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+    // JavaScript Logic
+    
+    // 1. The Response Map (Static Knowledge Base)
+    const responseMap = [
+        {
+            keywords: ["who", "built", "created", "made", "developed", "programmed", "creator", "designed", "coded", "responsible", "developer", "engineered", "behind"],
+            response: "I was built by a Python developer, running in Termux on Android! They coded me to help with questions, generate images, and teach skills like Python."
+        },
+        {
+            keywords: ["name", "identity", "call", "address"],
+            // NAME CHANGE HERE
+            response: "My name is **CogniPy**—your friendly coding buddy! 😊" 
+        },
+        {
+            keywords: ["purpose", "service", "offer", "assist", "what can you do"],
+            response: "I can answer questions, debug code, explain concepts, and teach Python skills. Ask away!"
+        },
+        {
+            keywords: ["help", "support", "how to"],
+            response: "I'm here to help with coding, explanations, or fun facts. What's up?"
+        },
+        {
+            keywords: ["hello", "hi", "hey", "greetings", "good morning"],
+            response: "Hey there! What's on your mind today! 🚀"
+        },
+        {
+            keywords: ["code", "debug", "python", "program", "fix error"],
+            response: "We can play a word game or I can tell you something cool. Just ask!"
+        },
+        {
+            keywords: ["file", "save", "read", "write"],
+            response: "Python can read, write, and edit files easily. Need an example script?"
+        },
+        {
+            keywords: ["ai", "chatbot", "robot"],
+            // NAME CHANGE HERE
+            response: "Yes, I'm a simple AI chatbot named **CogniPy**—no brain, just keywords and love for coding! 🤖" 
+        },
+        {
+            keywords: ["start", "ready", "go"],
+            response: "I'm ready when you are! What would you like to do?"
+        },
+        {
+            keywords: ["clear", "reset", "restart"],
+            response: "To restart, just rerun the script or refresh the session."
+        },
+        {
+            keywords: ["speak", "voice", "talk"],
+            response: "I only chat in text right now, but I can still hold a great conversation!"
+        },
+        {
+            keywords: ["internet", "online", "browse"],
+            response: "I can't browse the internet, but I can share helpful info and examples."
+        },
+        {
+            keywords: ["sleep", "rest", "pause"],
+            response: "Okay, take a break. I’ll be here when you get back! 😴"
+        },
+        {
+            keywords: ["speed", "fast", "slow"],
+            response: "I'm as fast as your processor! Got a task for me?"
+        },
+        {
+            keywords: ["learn", "study", "teach me", "training", "skills"],
+            response: "I'm here to help you learn new skills like Python, debugging, and logical thinking!"
+        },
+        {
+            keywords: ["language", "programming language", "code language"],
+            response: "I work best with Python, but I can help with other languages like JavaScript, HTML, and more!"
+        },
+        {
+            keywords: ["termux", "android", "mobile", "terminal"],
+            response: "Yes, I'm running inside Termux on Android. A great way to code on mobile!"
+        },
+        {
+            keywords: ["who are you", "what are you"],
+            // NAME CHANGE HERE
+            response: "I'm **CogniPy**, a simple chatbot built with Python to help and chat with you!" 
+        },
+        {
+            keywords: ["error", "bug", "crash"],
+            response: "Send me the error message, and I’ll help you debug it step-by-step."
+        },
+        {
+            keywords: ["version", "update", "new features"],
+            response: "I'm a basic chatbot, but I can always be improved! Add more responses to grow my brain. 🧠"
+        },
+        {
+            keywords: ["motivate", "encourage", "inspire", "boost"],
+            response: "You're doing great! Keep coding and keep learning—every bug is a step forward. 💪"
+        },
+        {
+            keywords: ["bored", "fun", "game"],
+            response: "Paste your code, and I'll help debug or improve it. Let's code!"
+        },
+        {
+            keywords: ["explain", "define", "what is", "tell me about"],
+            response: "Sure, I'll break it down simply. What do you want explained?"
+        },
+        {
+            keywords: ["gravity", "gravitational field", "physics"],
+            response: "A gravitational field is a region in space where a mass experiences a force of gravity due to another mass. Like Earth's pull on you! 🌍"
+        },
+        {
+            keywords: ["fun fact", "joke", "interesting"],
+            response: "Fun fact: Octopuses have three hearts and blue blood. Want another! 🐙"
+        },
+        {
+            keywords: ["image", "generate", "picture"],
+            response: "I can't generate images yet, but describe what you want—I can suggest ideas or code to make one in Python!"
+        },
+        {
+            keywords: ["thanks", "thank you", "appreciate"],
+            response: "You're welcome! Happy to help anytime. 😄"
+        },
+        {
+            keywords: ["bye", "goodbye", "see you"],
+            response: "Catch you later! 👋"
+        },
+        {
+            keywords: ["weather", "time", "date"],
+            response: "I don't check real-time stuff, but you can use Python's datetime module for that. Need code!"
+        },
+        {
+            keywords: ["history", "log", "conversation"],
+            response": "I don’t store history yet, but you can scroll back to see our chat."
+        },
+        {
+            keywords: ["openai", "gpt", "chatgpt"],
+            // NAME CHANGE HERE
+            response: "I'm inspired by OpenAI's ChatGPT, but I'm just a tiny offline version built with Python! I am **CogniPy**." 
+        },
+        {
+            keywords: ["math", "calculate", "solve"],
+            response: "I can solve basic math problems. Try me!"
+        },
+        {
+            keywords: ["project", "idea", "build"],
+            response": "Want project ideas! How about a calculator, to-do app, or chatbot like me!"
+        }
+    ];
+
+    const exitPhrases = ['go', 'exit', 'quit', 'bye', 'stop', 'can we stop', 'end', 'leave'];
+    const chatBox = document.getElementById('chat-box');
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+
+    // --- Dynamic API Function (Time Fetching) ---
+    async function fetchTime() {
+        try {
+            const response = await fetch('http://worldtimeapi.org/api/ip');
+            
+            if (!response.ok) {
+                return "Sorry, I couldn't connect to the time server right now (API error).";
+            }
+            
+            const data = await response.json();
+            
+            const dateTimeString = data.datetime; 
+            const date = new Date(dateTimeString);
+            const timeOptions = { hour: 'numeric', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+            const formattedTime = date.toLocaleTimeString('en-US', timeOptions);
+            
+            return `The current time is **${formattedTime}** in your local area (${data.timezone}).`;
+
+        } catch (error) {
+            console.error("API Fetch Error:", error);
+            return "I am currently unable to check the time due to a network connection error.";
+        }
+    }
+    // -----------------------------------
+
+
+    // Function to add a message to the chat box
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        messageDiv.classList.add(sender === 'ai' ? 'ai-message' : 'user-message');
+        messageDiv.innerHTML = text; 
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return messageDiv; 
+    }
+
+    // Initial greeting
+    // NAME CHANGE HERE
+    addMessage("Hello! I am **CogniPy**. What can I help you with? You can now ask me for the **time**!", 'ai'); 
+
+    // Function to get the AI response (ASYNCHRONOUS)
+    async function getAiResponse(input) {
+        const normalizedInput = input.toLowerCase().trim();
+        let response = "";
+
+        // 1. Check for exit phrase
+        if (exitPhrases.some(phrase => normalizedInput.includes(phrase))) {
+            return "Goodbye 👋";
+        }
+
+        // 2. Dynamic API check (Time/Date)
+        const timeKeywords = ["time", "date", "now", "clock", "what is the time"];
+        if (timeKeywords.some(keyword => normalizedInput.includes(keyword))) {
+            return await fetchTime(); 
+        }
+
+        // 3. Keyword map check (Fallback to static responses)
+        for (const item of responseMap) {
+            if (item.keywords.some(keyword => normalizedInput.includes(keyword))) {
+                response = item.response;
+                break;
+            }
+        }
+
+        // 4. Default Fallback
+        if (response) {
+            return response;
+        } else {
+            return "I don't quite understand that yet. Try asking about Python, a fun fact, or the current time!";
+        }
+    }
+
+    // Function to handle user input and display response (ASYNCHRONOUS)
+    async function handleInput() {
+        const input = userInput.value;
+        if (input.trim() === '') return;
+
+        // 1. Display user message and clear input
+        addMessage(input, 'user');
+        userInput.value = '';
+        
+        // 2. Add temporary 'Thinking' message
+        const loadingMessage = addMessage("CogniPy is thinking...", 'ai'); // Name change in loading
+        loadingMessage.id = 'loading-temp'; 
+
+        // 3. Get AI response (WAIT for the static or API response)
+        const aiResponse = await getAiResponse(input);
+
+        // 4. Remove the 'Thinking' message
+        const tempMsg = document.getElementById('loading-temp');
+        if (tempMsg) {
+            chatBox.removeChild(tempMsg);
+        }
+
+        // 5. Display the final AI response
+        addMessage(aiResponse, 'ai');
+
+        // Optional: Handle exit condition (disable input)
+        if (aiResponse.includes("Goodbye")) {
+            userInput.disabled = true;
+            sendButton.disabled = true;
+        }
+    }
+
+    // Event listeners
+    sendButton.addEventListener('click', handleInput);
+    userInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            handleInput();
+        }
+    });
+
+</script>
+
+</body>
+</html>
