@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CogniPy Chatbot - Dynamic</title>
     <style>
-        /* CSS for the Chat Interface */
+        /* CSS remains unchanged */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -113,7 +113,6 @@
         },
         {
             keywords: ["name", "identity", "call", "address"],
-            // NAME CHANGE HERE
             response: "My name is **CogniPy**—your friendly coding buddy! 😊" 
         },
         {
@@ -138,7 +137,6 @@
         },
         {
             keywords: ["ai", "chatbot", "robot"],
-            // NAME CHANGE HERE
             response: "Yes, I'm a simple AI chatbot named **CogniPy**—no brain, just keywords and love for coding! 🤖" 
         },
         {
@@ -179,7 +177,6 @@
         },
         {
             keywords: ["who are you", "what are you"],
-            // NAME CHANGE HERE
             response: "I'm **CogniPy**, a simple chatbot built with Python to help and chat with you!" 
         },
         {
@@ -232,7 +229,6 @@
         },
         {
             keywords: ["openai", "gpt", "chatgpt"],
-            // NAME CHANGE HERE
             response: "I'm inspired by OpenAI's ChatGPT, but I'm just a tiny offline version built with Python! I am **CogniPy**." 
         },
         {
@@ -253,7 +249,8 @@
     // --- Dynamic API Function (Time Fetching) ---
     async function fetchTime() {
         try {
-            const response = await fetch('http://worldtimeapi.org/api/ip');
+            // *** CORRECTION: Changed 'http' to 'https' for secure deployment ***
+            const response = await fetch('https://worldtimeapi.org/api/ip'); 
             
             if (!response.ok) {
                 return "Sorry, I couldn't connect to the time server right now (API error).";
@@ -288,7 +285,6 @@
     }
 
     // Initial greeting
-    // NAME CHANGE HERE
     addMessage("Hello! I am **CogniPy**. What can I help you with? You can now ask me for the **time**!", 'ai'); 
 
     // Function to get the AI response (ASYNCHRONOUS)
@@ -333,7 +329,7 @@
         userInput.value = '';
         
         // 2. Add temporary 'Thinking' message
-        const loadingMessage = addMessage("CogniPy is thinking...", 'ai'); // Name change in loading
+        const loadingMessage = addMessage("CogniPy is thinking...", 'ai'); 
         loadingMessage.id = 'loading-temp'; 
 
         // 3. Get AI response (WAIT for the static or API response)
